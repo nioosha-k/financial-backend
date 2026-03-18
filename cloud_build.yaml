@@ -28,7 +28,7 @@ steps:
     '--port', '80',
     '--set-env-vars', 'PORT_NUMBER=80',
     '--set-env-vars', 'ENV=prod',
-    '--set-env-vars', 'OPENAI_API_KEY=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',
+    '--set-env-vars', 'OPENAI_API_KEY=Your OpenAI API Key',
     ]
 
 timeout: 600s
