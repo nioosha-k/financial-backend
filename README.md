@@ -267,3 +267,23 @@ AI prompt templates are defined in `app/constants/prompts.py`. You can customize
 }
 ```
 → **Result:** `requires_clarification` with `NEGATIVE_NET_CASH_FLOW` and `NSF_ACTIVITY_DETECTED` flags
+
+# Future Improvements:
+## In the first 4 hours:
+    - I'd add security: JWT for the authentication.
+        - I'd add a login endpoint that returns access token and refresh token to the user.
+        - All the sensetive routes should be protected.
+    - Use Cloud Secret for the API_KEY
+    - I'd use another tool like few shot training with the LLM to validate our risk factors.
+        - This would help us to iterate on our approach.
+        - For oiur samples I would need some real cases for our financial team.
+
+## In the second 4 hours:      
+    - I'd create AI Agents for cutomers/officers.
+        To help them relate to the result.
+        To create a close-loop feedback for us to improve our model.
+    - Use GKE for the deployment.
+    - Add load balancing/rate limiting to our API.
+
+## I would work on this idea later:    
+    - Using embedding similarity instead of rigid rules.
