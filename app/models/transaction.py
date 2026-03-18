@@ -26,3 +26,7 @@ class TransactionsPayload(BaseModel):
     """Payload containing list of transactions to analyze."""
 
     transactions: list[Transaction] = Field(..., min_length=1)
+    ai_summary: bool = Field(
+        default=False,
+        description="If true, include an AI-generated human-readable summary",
+    )

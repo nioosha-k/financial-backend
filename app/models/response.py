@@ -35,3 +35,4 @@ class FinancialSummary(BaseModel):
     readiness: ReadinessBand
     readiness_reasoning: str
     analyzed_at: str
+    ai_summary: Optional[str] = None

@@ -19,6 +19,7 @@ from app.services import (
     detect_high_expense_concentration,
     detect_low_inflow_frequency,
     calculate_readiness,
+    generate_ai_summary,
 )
 
 router = APIRouter()
@@ -78,6 +79,22 @@ async def analyze_transactions(payload: TransactionsPayload) -> FinancialSummary
         net_cash_flow, risk_flags, total_inflow, total_outflow
     )
 
+    ai_summary_text = None
+    if payload.ai_summary:
+        ai_summary_text = await generate_ai_summary(
+            total_inflow=round(total_inflow, 2),
+            total_outflow=round(total_outflow, 2),
+            net_cash_flow=round(net_cash_flow, 2),
+            inflow_count=len(inflows),
+            outflow_count=len(outflows),
+            largest_inflow=round(largest_inflow, 2) if largest_inflow else None,
+            largest_outflow=round(largest_outflow, 2) if largest_outflow else None,
+            average_transaction_value=round(average_value, 2),
+            risk_flags=risk_flags,
+            readiness=readiness,
+            readiness_reasoning=readiness_reasoning,
+        )
+
     return FinancialSummary(
         total_inflow=round(total_inflow, 2),
         total_outflow=round(total_outflow, 2),
@@ -91,6 +108,7 @@ async def analyze_transactions(payload: TransactionsPayload) -> FinancialSummary
         readiness=readiness,
         readiness_reasoning=readiness_reasoning,
         analyzed_at=datetime.utcnow().isoformat() + "Z",
+        ai_summary=ai_summary_text,
     )
 
 

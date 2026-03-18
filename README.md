@@ -7,6 +7,7 @@ A FastAPI backend service that analyzes financial transactions and returns struc
 - **Transaction Analysis**: Calculate inflows, outflows, net cash flow, and averages
 - **Risk Detection**: Automated flagging of concerning financial patterns
 - **Readiness Classification**: Assess overall financial health with reasoning
+- **AI Summary**: Optional GPT-4o-mini powered human-readable summary of the analysis
 
 ## Project Structure
 
@@ -17,7 +18,8 @@ challenge/
 │   ├── main.py                    # FastAPI application entry point
 │   ├── constants/
 │   │   ├── __init__.py
-│   │   └── thresholds.py          # Configuration constants
+│   │   ├── thresholds.py          # Configuration constants
+│   │   └── prompts.py             # AI prompt templates
 │   ├── models/
 │   │   ├── __init__.py
 │   │   ├── transaction.py         # Transaction Pydantic models
@@ -25,7 +27,8 @@ challenge/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── risk_detection.py      # Risk flag detection logic
-│   │   └── readiness.py           # Readiness calculation logic
+│   │   ├── readiness.py           # Readiness calculation logic
+│   │   └── ai_summary.py          # AI summary generation
 │   └── routers/
 │       ├── __init__.py
 │       └── analysis.py            # API route handlers
@@ -47,6 +50,14 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
+
+### Environment Variables
+
+For AI summary functionality, set your OpenAI API key:
+
+```bash
+export OPENAI_API_KEY=your-api-key-here
 ```
 
 ### Running the Server
@@ -88,9 +99,15 @@ Analyzes a set of financial transactions.
       "date": "2024-01-01",
       "category": "housing"
     }
-  ]
+  ],
+  "ai_summary": false
 }
 ```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `transactions` | array | Yes | List of transaction objects |
+| `ai_summary` | boolean | No | Set to `true` to include an AI-generated human-readable summary (requires `OPENAI_API_KEY`) |
 
 **Response:**
 
@@ -107,7 +124,28 @@ Analyzes a set of financial transactions.
   "risk_flags": [],
   "readiness": "strong",
   "readiness_reasoning": "Healthy positive cash flow with comfortable expense margins. Financial position appears stable.",
-  "analyzed_at": "2024-01-20T12:00:00.000000Z"
+  "analyzed_at": "2024-01-20T12:00:00.000000Z",
+  "ai_summary": null
+}
+```
+
+**Response with AI Summary (`ai_summary: true`):**
+
+```json
+{
+  "total_inflow": 5000.0,
+  "total_outflow": 1500.0,
+  "net_cash_flow": 3500.0,
+  "inflow_count": 1,
+  "outflow_count": 1,
+  "largest_inflow": 5000.0,
+  "largest_outflow": 1500.0,
+  "average_transaction_value": 3250.0,
+  "risk_flags": [],
+  "readiness": "strong",
+  "readiness_reasoning": "Healthy positive cash flow with comfortable expense margins. Financial position appears stable.",
+  "analyzed_at": "2024-01-20T12:00:00.000000Z",
+  "ai_summary": "Great news! Your finances are looking healthy. You brought in $5,000 and spent $1,500, leaving you with a comfortable $3,500 surplus. Your expense ratio is just 30%, which means you're living well within your means..."
 }
 ```
 
@@ -189,6 +227,8 @@ NSF_KEYWORDS = ["nsf", "insufficient", "returned", "bounced", "overdraft"]
 ```
 
 Modify these values to adjust sensitivity for your use case.
+
+AI prompt templates are defined in `app/constants/prompts.py`. You can customize the system and user prompts to adjust the tone and content of AI-generated summaries.
 
 ## Example Scenarios
 
