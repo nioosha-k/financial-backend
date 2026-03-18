@@ -1,0 +1,36 @@
+steps:
+- id: "Build Docker Image"
+  name: 'gcr.io/cloud-builders/docker:latest'
+  dir: '.'
+  args: ['build', 
+          '-t', 'us-central1-docker.pkg.dev/smd-web-api/tiny1-artifact-registery/financial-backend',
+          '.']  
+
+- id: "Push Docker Image To Artifact Registry"
+  name: 'gcr.io/cloud-builders/docker:latest'
+  args: ['push', '--all-tags', 'us-central1-docker.pkg.dev/smd-web-api/tiny1-artifact-registery/financial-backend']
+
+- id: "Deploy Cloud Run Service"
+  name: 'gcr.io/cloud-builders/gcloud:latest'
+  args: [
+    'run', 'deploy', 'financial-backend', 
+    '--service-account' ,'sa-test1-cloud-build@smd-web-api.iam.gserviceaccount.com',
+    '--allow-unauthenticated',
+    '--memory', '1Gi',
+    '--concurrency', '180',
+    '--platform', 'managed',
+    '--image', 'us-central1-docker.pkg.dev/smd-web-api/tiny1-artifact-registery/financial-backend',
+    '--timeout', '180',
+    '--min-instances', '0',
+    '--max-instances', '1',
+    '--ingress', 'all',
+    '--region', 'us-central1',
+    '--port', '80',
+    '--set-env-vars', 'PORT_NUMBER=80',
+    '--set-env-vars', 'ENV=prod',
+    ]
+
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamic_substitutions: true
